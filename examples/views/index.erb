@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AIO Check Out</title>
+  <link rel="stylesheet" type="text/css" href="<%= url("/style.css")%>">
+</head>
+<body>
+  <form action="https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V2" method="post">
+    <table>
+      <caption>AIO Check Out</caption>
+      <% @client.options.each do |k, v| %>
+        <tr>
+          <th class="title"><%= k %></th>
+          <td><%= v %></td>
+        </tr>
+      <% end %>
+      <% @params.each do |k, v| %>
+        <tr>
+          <th class="title"><%= k %></th>
+          <td>
+            <%= v %>
+            <input type="hidden" name="<%= k %>" value="<%= v %>">
+          </td>
+        </tr>
+      <% end %>
+      <tr>
+        <td colspan="2"><input type="submit"></td>
+      </tr>
+    </table>
+  </form>
+</body>
+</html>
