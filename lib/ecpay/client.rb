@@ -19,7 +19,8 @@ module Ecpay
     attr_reader :options
 
     def initialize(options = {})
-      @options = { mode: :production }.merge!(options)
+      @options = { mode: :production,
+                   gateway_type: :payment }.merge!(options)
       case @options[:mode]
       when :production
         option_required! :merchant_id, :hash_key, :hash_iv
@@ -42,6 +43,8 @@ module Ecpay
       raw = params.sort_by { |k, _v| k.downcase }.map! { |k, v| "#{k}=#{v}" }.join('&')
       padded = "HashKey=#{@options[:hash_key]}&#{raw}&HashIV=#{@options[:hash_iv]}"
       url_encoded = CGI.escape(padded).downcase!
+
+      return Digest::MD5.hexdigest(url_encoded).upcase! if @options[:gateway_type] == :logistic
       Digest::SHA256.hexdigest(url_encoded).upcase!
     end
 

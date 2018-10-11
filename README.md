@@ -17,12 +17,15 @@ gem install ecpay_client
 
 ## 使用
 
+- 指定 `gateway_type` 為 `:logistic` 時會使用 MD5 製作 `CheckMacValue`
+
 ```ruby
 test_client = Ecpay::Client.new(mode: :test)
 production_client = Ecpay::Client.new({
   merchant_id: 'MERCHANT_ID',
   hash_key: 'HASH_KEY',
   hash_iv: 'HASH_IV'
+  gateway_type: :logistic #(default: :payment)
 })
 
 test_client.request(
@@ -34,16 +37,16 @@ test_client.request(
 
 本文件撰寫時，綠界共有 8 個 API (全方位金流介接技術文件 V2.0.6)：
 
-Endpoint                            | 說明
----                                 | ---
-/Cashier/AioCheckOut/V2             | 產生訂單
-/Cashier/QueryTradeInfo/V2          | 查詢訂單
-/Cashier/QueryCreditCardPeriodInfo  | 信用卡定期定額訂單查詢
-/CreditDetail/DoAction              | 信用卡關帳/退刷/取消/放棄
-/Cashier/Capture                    | 合作特店申請撥款
-/PaymentMedia/TradeNoAio            | 下載合作特店對帳媒體檔
-/CreditDetail/QueryTrade/V2         | 查詢信用卡單筆明細記錄
-/CreditDetail/FundingReconDetail    | 下載信用卡撥款對帳資料檔
+| Endpoint                           | 說明                      |
+| ---------------------------------- | ------------------------- |
+| /Cashier/AioCheckOut/V2            | 產生訂單                  |
+| /Cashier/QueryTradeInfo/V2         | 查詢訂單                  |
+| /Cashier/QueryCreditCardPeriodInfo | 信用卡定期定額訂單查詢    |
+| /CreditDetail/DoAction             | 信用卡關帳/退刷/取消/放棄 |
+| /Cashier/Capture                   | 合作特店申請撥款          |
+| /PaymentMedia/TradeNoAio           | 下載合作特店對帳媒體檔    |
+| /CreditDetail/QueryTrade/V2        | 查詢信用卡單筆明細記錄    |
+| /CreditDetail/FundingReconDetail   | 下載信用卡撥款對帳資料檔  |
 
 詳細 API 參數請參閱綠界金流介接技術文件，注意幾點：
 
@@ -52,19 +55,19 @@ Endpoint                            | 說明
 
 ## Ecpay::Client
 
-實體方法                                                      | 回傳                 | 說明
----                                                          | ---                 | ---
-`request(path, **params)`                                    | `Net::HTTPResponse` | 發送 API 請求
-`make_mac(**params)`                                         | `String`            | 用於產生 `CheckMacValue`，單純做加密，`params` 需要完整包含到 `MerchantID`
-`verify_mac(**params)`                                       | `Boolean`           | 用於檢查收到的參數，其檢查碼是否正確，這用在綠界的 `ReturnURL` 與 `PeriodReturnURL` 參數上。
-`query_trade_info(merchant_trade_number, platform = nil)`    | `Hash`              | `/Cashier/QueryTradeInfo/V2` 的捷徑方法，將 `TimeStamp` 設定為當前時間
-`query_credit_card_period_info(merchant_trade_number)`       | `Hash`              | `/Cashier/QueryCreditCardPeriodInfo` 的捷徑方法，將 `TimeStamp` 設定為當前時間
-`generate_checkout_params`                                   | `Hash`              | 用於產生 `/Cashier/AioCheckOut/V2` 表單需要的參數，`MerchantTradeDate`、`MerchantTradeNo`、`PaymentType`，可省略。
+| 實體方法                                                     | 回傳                | 說明                                                                                                               |
+| ------------------------------------------------------------ | ------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `request(path, **params)`                                    | `Net::HTTPResponse` | 發送 API 請求                                                                                                      |
+| `make_mac(**params)`                                         | `String`            | 用於產生 `CheckMacValue`，單純做加密，`params` 需要完整包含到 `MerchantID`                                         |
+| `verify_mac(**params)`                                       | `Boolean`           | 用於檢查收到的參數，其檢查碼是否正確，這用在綠界的 `ReturnURL` 與 `PeriodReturnURL` 參數上。                       |
+| `query_trade_info(merchant_trade_number, platform = nil)`    | `Hash`              | `/Cashier/QueryTradeInfo/V2` 的捷徑方法，將 `TimeStamp` 設定為當前時間                                             |
+| `query_credit_card_period_info(merchant_trade_number)`       | `Hash`              | `/Cashier/QueryCreditCardPeriodInfo` 的捷徑方法，將 `TimeStamp` 設定為當前時間                                     |
+| `generate_checkout_params`                                   | `Hash`              | 用於產生 `/Cashier/AioCheckOut/V2` 表單需要的參數，`MerchantTradeDate`、`MerchantTradeNo`、`PaymentType`，可省略。 |
 
 ## 使用範例
 
 ```bash
-git clone git@github.com:CalvertYang/ecpay.git
+git clone git@github.com:Dylan0203/ecpay.git
 cd ecpay
 bundle install
 ruby examples/server.rb
