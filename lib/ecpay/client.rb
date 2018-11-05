@@ -44,6 +44,8 @@ module Ecpay
       padded = "HashKey=#{@options[:hash_key]}&#{raw}&HashIV=#{@options[:hash_iv]}"
       url_encoded = CGI.escape(padded).downcase!
 
+      convert_to_dot_net(url_encoded)
+
       return Digest::MD5.hexdigest(url_encoded).upcase! if @options[:gateway_type] == :logistic
       Digest::SHA256.hexdigest(url_encoded).upcase!
     end
@@ -98,6 +100,16 @@ module Ecpay
     end
 
     private
+
+    def convert_to_dot_net(url_encoded)
+      url_encoded.gsub!('%2d', '-')
+      url_encoded.gsub!('%5f', '_')
+      url_encoded.gsub!('%2e', '.')
+      url_encoded.gsub!('%21', '!')
+      url_encoded.gsub!('%2a', '*')
+      url_encoded.gsub!('%28', '(')
+      url_encoded.gsub!('%29', ')')
+    end
 
     def option_required!(*option_names)
       option_names.each do |option_name|
